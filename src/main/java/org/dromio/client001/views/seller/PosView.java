@@ -8,7 +8,6 @@ import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -58,12 +57,11 @@ public class PosView extends HorizontalLayout {
 
         initUi();
         loadInventoryData();
-
         setMargin(true);
-
         add(
                 getMainContent()
         );
+
     }
 
     private void loadInventoryData() {
@@ -106,6 +104,7 @@ public class PosView extends HorizontalLayout {
 
         confirmSaleButton.addClickListener( event -> {
             if (!itemsToSell.isEmpty()) {
+                // TODO a pop up that show total amount and allow money to be received in cash or via other means
                 SaleReceivePaymentView paymentView = new SaleReceivePaymentView(String.valueOf(itemsToSell.getTotalPriceOfSelectedItems()));
                 paymentView.addPaymentConfirmedListener( confirmPaymentEvent -> {
                    runConfirmSaleAlgorithm();
@@ -120,13 +119,14 @@ public class PosView extends HorizontalLayout {
         });
 
         HorizontalLayout container = new HorizontalLayout(confirmSaleButton, cancelSaleButton);
+        container.addClassNames(LumoUtility.Display.FLEX);
+        container.setWidth("100%");
         container.setFlexGrow(1, confirmSaleButton);
         container.setFlexGrow(1, cancelSaleButton);
         return container;
     }
 
     private void runConfirmSaleAlgorithm() {
-        // TODO a pop up that show total amount and allow money to be received in cash or via other means
         try {
             createSalesRecord();
             itemsToSell.clearSelectedItems();
@@ -160,11 +160,11 @@ public class PosView extends HorizontalLayout {
 
     private void initSelectedItemsGrid() {
         selectedItemGrid = new Grid<>(ItemToSell.class, false);
-        selectedItemGrid.addColumn(ItemToSell::getItemName).setHeader("Item Name");
-        selectedItemGrid.addColumn(ItemToSell::getSelectedQuantity).setHeader("Selected Quantity");
-        selectedItemGrid.addColumn(ItemToSell::getSellingUnit).setHeader("Selling Unit");
-        selectedItemGrid.addColumn(ItemToSell::getItemSellingPrice).setHeader("Selling Price");
-        selectedItemGrid.addColumn(ItemToSell::getTotalPriceOfQuantitySelected).setHeader("Total Price of Quantity Selected");
+        selectedItemGrid.addColumn(ItemToSell::getItemName).setHeader("Name");
+        selectedItemGrid.addColumn(ItemToSell::getSelectedQuantity).setHeader("Quantity");
+        selectedItemGrid.addColumn(ItemToSell::getSellingUnit).setHeader("Unit");
+        selectedItemGrid.addColumn(ItemToSell::getItemSellingPrice).setHeader("Price");
+        selectedItemGrid.addColumn(ItemToSell::getTotalPriceOfQuantitySelected).setHeader("Sum");
         selectedItemGrid.setItems(itemsToSell.getSelectedItems());
         selectedItemGrid.setEmptyStateText("No Item Selected");
         selectedItemGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
