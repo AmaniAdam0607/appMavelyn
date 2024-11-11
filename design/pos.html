@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .scrollable-table {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .form-input, .form-select, .form-checkbox {
+            padding: 0.75rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <!-- Navbar -->
+    <header class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-semibold text-blue-600">Inventory Management</h1>
+            <nav>
+                <a href="home.html" class="text-gray-700 hover:text-blue-500 px-3">Home</a>
+                <a href="inventory.html" class="text-gray-700 hover:text-blue-500 px-3">Inventory</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto mt-10 px-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Product Details Table (Left Side) -->
+        <section class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-blue-500 mb-4">Product Details</h2>
+
+            <!-- Scrollable Product Details Table -->
+            <div class="scrollable-table">
+                <table class="w-full text-left border-collapse mb-4">
+                    <thead>
+                        <tr class="bg-gray-200 text-gray-600">
+                            <th class="px-4 py-2 border">Product Name</th>
+                            <th class="px-4 py-2 border">Unit</th>
+                            <th class="px-4 py-2 border">Buying Price</th>
+                            <th class="px-4 py-2 border">Selling Price</th>
+                            <th class="px-4 py-2 border">Category</th>
+                            <th class="px-4 py-2 border">Active</th>
+                        </tr>
+                    </thead>
+                    <tbody id="product-list">
+                        <!-- Sample product items for scrolling -->
+                        <tr><td class="px-4 py-2 border">Apples</td><td class="px-4 py-2 border">Kg</td><td class="px-4 py-2 border">$2.00</td><td class="px-4 py-2 border">$3.00</td><td class="px-4 py-2 border">Fruit</td><td class="px-4 py-2 border">Yes</td></tr>
+                        <tr><td class="px-4 py-2 border">Bananas</td><td class="px-4 py-2 border">Kg</td><td class="px-4 py-2 border">$0.40</td><td class="px-4 py-2 border">$0.50</td><td class="px-4 py-2 border">Fruit</td><td class="px-4 py-2 border">Yes</td></tr>
+                        <!-- Add more sample products as needed for testing -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Product Form (Right Side) -->
+        <section class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-blue-500 mb-4">Add / Edit Product</h2>
+            <form id="product-form" class="space-y-4">
+                <!-- Product Name Input -->
+                <div>
+                    <label for="product-name" class="block text-sm font-medium text-gray-700">Product Name</label>
+                    <input type="text" id="product-name" class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Enter product name" required>
+                </div>
+
+                <!-- Product Unit Dropdown -->
+                <div>
+                    <label for="product-unit" class="block text-sm font-medium text-gray-700">Product Unit</label>
+                    <select id="product-unit" class="form-select mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                        <option value="">Select unit</option>
+                        <option value="Kg">Kg</option>
+                        <option value="L">L</option>
+                        <option value="Piece">Piece</option>
+                    </select>
+                </div>
+
+                <!-- Buying Price Input -->
+                <div>
+                    <label for="buying-price" class="block text-sm font-medium text-gray-700">Buying Price</label>
+                    <input type="number" id="buying-price" class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Enter buying price" required>
+                </div>
+
+                <!-- Selling Price Input -->
+                <div>
+                    <label for="selling-price" class="block text-sm font-medium text-gray-700">Selling Price</label>
+                    <input type="number" id="selling-price" class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Enter selling price" required>
+                </div>
+
+                <!-- Product Category Dropdown -->
+                <div>
+                    <label for="product-category" class="block text-sm font-medium text-gray-700">Product Category</label>
+                    <select id="product-category" class="form-select mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                        <option value="">Select category</option>
+                        <option value="Fruit">Fruit</option>
+                        <option value="Vegetable">Vegetable</option>
+                        <option value="Dairy">Dairy</option>
+                    </select>
+                </div>
+
+                <!-- Active Checkbox -->
+                <div class="flex items-center mt-4">
+                    <input type="checkbox" id="is-active" class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="is-active" class="ml-2 block text-sm font-medium text-gray-700">Active</label>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-4">
+                    <button type="submit" class="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-md shadow hover:bg-blue-600 focus:outline-none">Save Product</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
+

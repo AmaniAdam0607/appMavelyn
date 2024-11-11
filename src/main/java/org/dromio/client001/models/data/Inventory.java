@@ -1,0 +1,62 @@
+package org.dromio.client001.models.data;
+
+import jakarta.persistence.*;
+
+import java.util.List;
+
+@Entity
+public class Inventory {
+
+    @Id
+    @GeneratedValue( strategy = GenerationType.UUID )
+    private String inventoryId;
+
+    private String name;
+
+    public Inventory(String inventoryId, String name, List<InventoryItem> items) {
+        this.inventoryId = inventoryId;
+        this.name = name;
+        this.items = items;
+    }
+
+    public Inventory() {
+    }
+
+    public Inventory(String name) {
+        this.name = name;
+    }
+
+    @OneToMany(
+            cascade = CascadeType.ALL
+    )
+    @JoinColumn(
+            name = "inventory_id",
+            referencedColumnName = "inventoryId"
+    )
+    private List<InventoryItem> items;
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getInventoryId() {
+        return inventoryId;
+    }
+
+    public void setInventoryId(String inventoryId) {
+        this.inventoryId = inventoryId;
+    }
+
+    public List<InventoryItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<InventoryItem> items) {
+        this.items = items;
+    }
+}

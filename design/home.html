@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duka - Sell Items</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Custom scrollable table height */
+        .scrollable-table {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <!-- Navbar -->
+    <header class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-semibold text-blue-600">Duka - Sell Items</h1>
+            <nav>
+                <a href="home.html" class="text-gray-700 hover:text-blue-500 px-3">Home</a>
+                <a href="duka.html" class="text-gray-700 hover:text-blue-500 px-3">Duka</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto mt-10 px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Selected Items Table (Left Side) -->
+        <section class="md:col-span-2 bg-white shadow rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-blue-500 mb-4">Selected Items</h2>
+
+            <!-- Scrollable Selected Items Table -->
+            <div class="scrollable-table">
+                <table class="w-full text-left border-collapse mb-4">
+                    <thead>
+                        <tr class="bg-gray-200 text-gray-600">
+                            <th class="px-4 py-2 border">Product</th>
+                            <th class="px-4 py-2 border">Quantity</th>
+                            <th class="px-4 py-2 border">Unit</th>
+                            <th class="px-4 py-2 border">Price</th>
+                            <th class="px-4 py-2 border">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="selected-items-list">
+                        <!-- Sample selected items -->
+                        <tr><td class="px-4 py-2 border">Pencil</td><td class="px-4 py-2 border">2</td><td class="px-4 py-2 border">pcs</td><td class="px-4 py-2 border">$0.50</td><td class="px-4 py-2 border">$1.00</td></tr>
+                        <tr><td class="px-4 py-2 border">Notebook</td><td class="px-4 py-2 border">1</td><td class="px-4 py-2 border">pcs</td><td class="px-4 py-2 border">$2.00</td><td class="px-4 py-2 border">$2.00</td></tr>
+                        <!-- Add 18 more rows for demonstration -->
+                        <tr><td class="px-4 py-2 border">Eraser</td><td class="px-4 py-2 border">5</td><td class="px-4 py-2 border">pcs</td><td class="px-4 py-2 border">$0.20</td><td class="px-4 py-2 border">$1.00</td></tr>
+                        <tr><td class="px-4 py-2 border">Pen</td><td class="px-4 py-2 border">10</td><td class="px-4 py-2 border">pcs</td><td class="px-4 py-2 border">$0.30</td><td class="px-4 py-2 border">$3.00</td></tr>
+                        <!-- Repeat similar rows to reach 20 items -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Total Amount -->
+            <div class="flex justify-end text-lg font-semibold text-gray-800 mt-4">
+                <span>Total: $</span><span id="total-amount">7.00</span>
+            </div>
+
+            <!-- Confirm Sale Button -->
+            <button id="confirm-sale" class="w-full bg-blue-600 text-white px-4 py-2 mt-6 rounded-md shadow hover:bg-blue-700">
+                Confirm Sale
+            </button>
+        </section>
+
+        <!-- Item Selector (Right Side) -->
+        <section class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-blue-500 mb-4">Item Selector</h2>
+
+            <!-- Search Bar -->
+            <input type="text" id="search-bar" class="w-full px-4 py-2 mb-4 border rounded-md" placeholder="Search items...">
+
+            <!-- Scrollable Items List Table -->
+            <div class="scrollable-table">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-200 text-gray-600">
+                            <th class="px-4 py-2 border">Product</th>
+                            <th class="px-4 py-2 border">Price</th>
+                            <th class="px-4 py-2 border">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="items-list">
+                        <!-- Sample items in Item Selector -->
+                        <tr><td class="px-4 py-2 border">Pencil</td><td class="px-4 py-2 border">$0.50</td><td class="px-4 py-2 border"><button class="add-item bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">Add</button></td></tr>
+                        <tr><td class="px-4 py-2 border">Notebook</td><td class="px-4 py-2 border">$2.00</td><td class="px-4 py-2 border"><button class="add-item bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">Add</button></td></tr>
+                        <!-- Add 18 more rows for demonstration -->
+                        <tr><td class="px-4 py-2 border">Eraser</td><td class="px-4 py-2 border">$0.20</td><td class="px-4 py-2 border"><button class="add-item bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">Add</button></td></tr>
+                        <tr><td class="px-4 py-2 border">Pen</td><td class="px-4 py-2 border">$0.30</td><td class="px-4 py-2 border"><button class="add-item bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">Add</button></td></tr>
+                        <!-- Repeat similar rows to reach 20 items -->
+                    </tbody>
+                </table>
+            </div>
+	</section>
+    </main>
+</body>
+</html>
+
