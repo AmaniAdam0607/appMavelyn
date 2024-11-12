@@ -39,11 +39,11 @@ public class ItemsToSell {
             if (existingItem != null) {
                 /*
                 * Notice that "existingItem" now points to an item that is in itemsToSell
-                * Changing anything on the "existingItem" variable propagates its changes to the returned item
+                * Changing anything on the "existingItem" variable propagates its changes to the item returned by findItemByComparingId(itemToSell)
                 * this brings the desired effect but is NOT clear at first glance
                 * God saving me from possible bugs.
                 * */
-                if ((quantityInStock - (existingItem.getSelectedQuantity() + 1)) < 0) { // TODO subtract against the 'expected' quantity and not the current selected quantity example here I add one since if we are to add we 'expect' the resulting selectedQuantity to be increased by one, this ok when item is added by clicking but what if a user is given ability to specify quantity via an input field? Then the 'expected' quantity may or may not be more than one.
+                if ((quantityInStock - (existingItem.getSelectedQuantity() + 1)) < 0) { // TODO subtract against the 'expected' quantity and not the current selected quantity example here I add one since if we are to add we 'expect' the resulting selectedQuantity to be increased by one, this ok when item is added by clicking in the item selector but what if a user is given ability to specify quantity via an input field? Then the 'expected' quantity may or may not be more than one.
                     throw new IllegalArgumentException("You can not select more than what is in stock for " + itemToSell.getItemName());
                 }
                 /*

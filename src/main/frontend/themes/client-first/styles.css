@@ -1,22 +1,13 @@
 @import url('./main-layout.css');
 
-/* Default hidden state for small screen message */
-.small-screen-message {
-    display: none;
+vaadin-notification-card::part(content) {
+    padding: 0;
+    display: flex; /* Optional: Ensures child can expand fully */
 }
 
-/* Show custom message and hide main content on screens smaller than 768px */
-@media (max-width: 768px) {
-    .main-content-wrapper > .v-app-layout {
-        display: none;
-    }
-    .small-screen-message {
-        display: block;
-        text-align: center;
-        padding: 20px;
-        font-size: 1.2em;
-        color: #333;
-    }
+vaadin-notification-card::part(content) > * {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box; /* To respect padding/margins within bounds */
 }
-
 

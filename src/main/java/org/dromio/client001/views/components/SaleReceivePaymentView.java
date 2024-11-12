@@ -12,6 +12,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.shared.Registration;
+import org.dromio.client001.utility.AppColor;
 
 public class SaleReceivePaymentView extends Dialog {
 
@@ -124,8 +125,8 @@ public class SaleReceivePaymentView extends Dialog {
         actionButtonsLayout.setWidth("100%");
         cancelButton.getStyle().set("flex-grow", "1");
         confirmButton.getStyle().set("flex-grow", "1");
-        cancelButton.getStyle().set("background-color", "#f44336").set("color", "white");
-        confirmButton.getStyle().set("background-color", "#4CAF50").set("color", "white");
+        cancelButton.getStyle().set("background-color", AppColor.CANCEL.toString()).set("color", "white");
+        confirmButton.getStyle().set("background-color", AppColor.CONFIRM.toString()).set("color", "white");
     }
 
     private void styleAmountInfoLayout() {

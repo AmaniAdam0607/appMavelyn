@@ -12,7 +12,7 @@ import org.dromio.client001.models.service.InventoryItemService;
 
 @PageTitle("My Sales")
 @Route("/mySales")
-@Menu( order = 0, title = "View my sales")
+@Menu( order = 1, title = "My sales")
 public class SalesScreen extends VerticalLayout {
 
     private final SalesRepository salesRepository;

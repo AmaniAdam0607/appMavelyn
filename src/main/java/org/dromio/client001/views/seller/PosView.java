@@ -22,6 +22,7 @@ import org.dromio.client001.models.data.ItemsToSell;
 import org.dromio.client001.models.data.Sales;
 import org.dromio.client001.models.repository.SalesRepository;
 import org.dromio.client001.models.service.InventoryService;
+import org.dromio.client001.utility.AppColor;
 import org.dromio.client001.utility.CustomNotification;
 import org.dromio.client001.views.components.SaleReceivePaymentView;
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ import java.util.List;
 
 @PageTitle("Sale Screen")
 @Route("")
-@Menu(order = 1, title = "Sales Point") // icon = "line-awesome/svg/globe-solid.svg"
+@Menu(order = 0, title = "Sales Point") // icon = "line-awesome/svg/globe-solid.svg"
 public class PosView extends HorizontalLayout {
 
     private final InventoryService inventoryService;
@@ -40,7 +41,7 @@ public class PosView extends HorizontalLayout {
     private final SalesRepository salesRepository;
 
     Button confirmSaleButton;
-    Button cancelSaleButton;
+    Button clearSelectedItemsButton;
     private final Logger logger = LoggerFactory.getLogger(PosView.class);
 
     private Grid<InventoryItem> inventoryGrid;
@@ -96,10 +97,10 @@ public class PosView extends HorizontalLayout {
     private Component getSaleActions() {
 
         confirmSaleButton = new Button("Confirm Sale");
-        cancelSaleButton = new Button("Cancel Sale");
+        clearSelectedItemsButton = new Button("Clear Selections");
 
-        confirmSaleButton.addClassNames(LumoUtility.Background.PRIMARY, LumoUtility.TextColor.PRIMARY_CONTRAST);
-        cancelSaleButton.addClassNames(LumoUtility.Background.ERROR, LumoUtility.TextColor.PRIMARY_CONTRAST);
+        confirmSaleButton.getStyle().set("background-color", AppColor.CONFIRM.toString()).set("color", "white");
+        clearSelectedItemsButton.getStyle().set("background-color", AppColor.CANCEL.toString()).set("color", "white");
 
 
         confirmSaleButton.addClickListener( event -> {
@@ -110,19 +111,30 @@ public class PosView extends HorizontalLayout {
                    runConfirmSaleAlgorithm();
                 });
                 paymentView.addPaymentCanceledListener( cancelPaymentEvent -> {
-                   CustomNotification.simpleErrorNotification("Payment Canceled!");
+                   CustomNotification.simpleInfoNotification("Payment Canceled!");
                 });
             }
             else {
-                CustomNotification.simpleErrorNotification("Please select item first");
+                CustomNotification.simpleWarningNotification("Please select item first");
             }
         });
 
-        HorizontalLayout container = new HorizontalLayout(confirmSaleButton, cancelSaleButton);
+        clearSelectedItemsButton.addClickListener( event -> {
+            if (itemsToSell.isEmpty()) {
+                CustomNotification.simpleWarningNotification("Selections are already empty!");
+            }
+            else {
+                itemsToSell.clearSelectedItems();
+                refreshSelectedItemsGrid();
+                CustomNotification.simpleSuccessNotification("Selections cleared!");
+            }
+        });
+
+        HorizontalLayout container = new HorizontalLayout(confirmSaleButton, clearSelectedItemsButton);
         container.addClassNames(LumoUtility.Display.FLEX);
         container.setWidth("100%");
         container.setFlexGrow(1, confirmSaleButton);
-        container.setFlexGrow(1, cancelSaleButton);
+        container.setFlexGrow(1, clearSelectedItemsButton);
         return container;
     }
 
@@ -175,19 +187,24 @@ public class PosView extends HorizontalLayout {
         inventoryGrid.addColumn(InventoryItem::getItemName).setHeader("Item Name");
         inventoryGrid.addColumn(InventoryItem::getQuantity).setHeader("Quantity");
         inventoryGrid.addColumn(InventoryItem::getSellingPrice).setHeader("Selling Price");
+        inventoryGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         inventoryGrid.addItemClickListener( event -> {
            InventoryItem inventoryItem = event.getItem();
            try {
                itemsToSell.addItemToSell(new ItemToSell(inventoryItem));
+               refreshSelectedItemsGrid();
+               logger.info("Item {} selected", inventoryItem.getItemName());
            }
+           //The "addItemToSell" throws error with custom messages as IllegalArgumentException
+           // Thus catching errors of those type is of interest to the user interaction
            catch (IllegalArgumentException e) {
-               //TODO somehow check the error returned, if the error returned is not the one expected then info maybe exposed to the user
-                CustomNotification.simpleErrorNotification(e.getMessage());
+                CustomNotification.simpleWarningNotification(e.getMessage());
            }
-           refreshSelectedItemsGrid();
-           //logger.info("Item " + inventoryItem.getItemName() + " selected");
+           //For any other error that was not expected
+           catch (Exception ex) {
+               logger.error("Error while adding item to the \"itemsToSell\" container {}", ex.getMessage());
+           }
         });
-        inventoryGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
 
         GridListDataView<InventoryItem> dataView = inventoryGrid.setItems(items);
 
