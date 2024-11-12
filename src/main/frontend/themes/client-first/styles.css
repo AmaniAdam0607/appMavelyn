@@ -1,1 +1,22 @@
 @import url('./main-layout.css');
+
+/* Default hidden state for small screen message */
+.small-screen-message {
+    display: none;
+}
+
+/* Show custom message and hide main content on screens smaller than 768px */
+@media (max-width: 768px) {
+    .main-content-wrapper > .v-app-layout {
+        display: none;
+    }
+    .small-screen-message {
+        display: block;
+        text-align: center;
+        padding: 20px;
+        font-size: 1.2em;
+        color: #333;
+    }
+}
+
+

@@ -2,10 +2,7 @@ package org.dromio.client001.views;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.html.Footer;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Header;
-import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.SvgIcon;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
@@ -27,10 +24,12 @@ public class MainLayout extends AppLayout {
     private H1 viewTitle;
 
     public MainLayout() {
+
         setPrimarySection(Section.DRAWER);
         setDrawerOpened(false);
         addDrawerContent();
         addHeaderContent();
+
     }
 
     private void addHeaderContent() {

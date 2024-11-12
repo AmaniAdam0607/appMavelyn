@@ -18,3 +18,7 @@ vaadin-side-nav-item vaadin-icon {
 [slot="drawer"]:is(header, footer):is(:empty) {
   display: none;
 }
+
+vaadin-app-layout {
+  --vaadin-app-layout-drawer-overlay: true;
+}
