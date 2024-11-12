@@ -12,7 +12,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.shared.Registration;
-import com.vaadin.flow.theme.lumo.LumoUtility;
 
 public class SaleReceivePaymentView extends Dialog {
 
@@ -40,7 +39,7 @@ public class SaleReceivePaymentView extends Dialog {
     private Component getContentWrapper() {
         VerticalLayout wrapper = new VerticalLayout(amountInfoLayout, paymentMethodLayout,actionButtonsLayout);
         wrapper.setSizeFull();
-        wrapper.getStyle().set("display", "flex");
+        wrapper.getStyle().set("display", "flex").set("justify-content", "space-around");
         return wrapper;
     }
 
@@ -79,14 +78,27 @@ public class SaleReceivePaymentView extends Dialog {
         HorizontalLayout referenceLayout = new HorizontalLayout();
         referenceLayout.setVisible(false);
 
-        Checkbox paymentMethodQuestion = new Checkbox();
-        paymentMethodQuestion.setLabel("Payment received in cash?");
-        paymentMethodQuestion.setValue(true);
-        paymentMethodQuestion.addValueChangeListener(event -> {
-           referenceLayout.setVisible(!referenceLayout.isVisible());
+        HorizontalLayout paymentMethodQuestion = new HorizontalLayout();
+        Text methodInfo = new Text("Payment was receieved in cash?");
+        Button paymentToggleButton = new Button("Yes");
+        paymentToggleButton.addClickListener(event -> {
+            // if the button is currently displaying "Yes" and is clicked
+            // then change the displaying text to "No" and show
+            // the text field to enter reference number
+            // Otherwise, if the button is currently "No" and is clicked
+            // return to the normal behaviour, hide the reference no text field
+            if (paymentToggleButton.getText().equals("Yes")) {
+                paymentToggleButton.setText("No");
+                referenceLayout.setVisible(!referenceLayout.isVisible());
+            }
+            else {
+                   paymentToggleButton.setText("Yes");
+                   referenceLayout.setVisible(!referenceLayout.isVisible());
+            }
         });
-
-        paymentMethodQuestion.getStyle().set("display", "flex").set("flex-direction", "row-reverse").set("align-items", "center");
+        paymentMethodQuestion.add(methodInfo, paymentToggleButton);
+        paymentMethodQuestion.setWidth("100%");
+        paymentMethodQuestion.getStyle().set("display", "flex").set("justify-content", "space-between").set("align-items", "center");
 
         Text referenceNumberLabel = new Text("Enter reference number : ");
         TextField referenceNumberField = new TextField();
@@ -96,9 +108,11 @@ public class SaleReceivePaymentView extends Dialog {
 
         referenceLayout.add(referenceNumberLabel, referenceNumberField);
         referenceLayout.setWidth("100%");
+        referenceLayout.getStyle().set("display", "flex").set("justify-content", "space-between").set("align-items", "center");
 
         paymentMethodLayout.add(paymentMethodQuestion, referenceLayout);
         paymentMethodLayout.setWidth("100%");
+        paymentMethodLayout.setPadding(false);
     }
 
     private void styleActionButtonsLayout() {
@@ -123,10 +137,8 @@ public class SaleReceivePaymentView extends Dialog {
         amountText.getStyle().set("color", "green");
 
         amountInfoLayout.add(label, amountText);
-        amountInfoLayout.getStyle().set("display", "flex").set("border-bottom", "1px solid");
+        amountInfoLayout.getStyle().set("display", "flex").set("border-bottom", "1px solid").set("justify-content", "space-between");
         amountInfoLayout.setWidth("100%");
-        label.getStyle().set("flex-grow", "1");
-        amountText.getStyle().set("flex-grow", "1");
     }
 
     // Custom event classes for confirm and cancel actions
