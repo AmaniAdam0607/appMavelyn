@@ -88,10 +88,6 @@ public class Sales {
         this.soldWithPrice = soldWithPrice;
     }
 
-    public Double getTotalPrice() {
-        return totalPrice;
-    }
-
     public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
     }
