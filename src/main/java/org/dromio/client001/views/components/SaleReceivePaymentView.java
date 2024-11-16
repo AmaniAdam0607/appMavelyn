@@ -29,7 +29,6 @@ public class SaleReceivePaymentView extends Dialog {
         initUi();
         configureDialog();
         configureActionButtons();
-
         add(
                 getContentWrapper()
         );

@@ -5,7 +5,6 @@ import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 public class MoneyFormatter {
-
     public static String formatMoney(Double amount) {
         if (amount == null) {
             return "0.00 Tsh"; // Default value when amount is null

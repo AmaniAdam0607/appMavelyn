@@ -41,7 +41,7 @@ public class CustomNotification {
                 .set("color", "white")
         ;
         layout.setPadding(true);
-        layout.add(new Text(message), type.getIcon());
+        layout.add(new Text(message));
 
         Notification notification = new Notification(layout);
         notification.addClassNames("custom-notification");

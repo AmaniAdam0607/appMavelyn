@@ -25,6 +25,7 @@ import org.dromio.client001.models.service.InventoryService;
 import org.dromio.client001.utility.AppColor;
 import org.dromio.client001.utility.CustomNotification;
 import org.dromio.client001.views.components.SaleReceivePaymentView;
+import org.dromio.client001.views.components.SingleItemSelectorView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -180,6 +181,18 @@ public class PosView extends HorizontalLayout {
         selectedItemGrid.setItems(itemsToSell.getSelectedItems());
         selectedItemGrid.setEmptyStateText("No Item Selected");
         selectedItemGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+        selectedItemGrid.addItemClickListener( event -> {
+            SingleItemSelectorView singleItemSelectorView = new SingleItemSelectorView(event.getItem());
+
+            singleItemSelectorView.addSaveSelectionConfirmedListener( saveEvent -> {
+                CustomNotification.simpleSuccessNotification("Saved Successfully!");
+            });
+
+            singleItemSelectorView.addCancelSelectionCanceledListener( cancelEvent -> {
+                CustomNotification.simpleWarningNotification("Item Selection Window Closed, nothing was saved.");
+            });
+        });
+
     }
 
     private Component getItemSelectorAndSearchFieldTable() {

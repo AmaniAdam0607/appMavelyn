@@ -5,10 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Repository
 public interface SalesRepository extends ListCrudRepository<Sales, String> {
     // Query for sales in a given date range
     //@Query("SELECT s FROM Sales s WHERE s.soldAtTime BETWEEN :startDate AND :endDate")
