@@ -10,18 +10,22 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.shared.Registration;
 import org.dromio.client001.models.data.ItemToSell;
+import org.dromio.client001.models.data.ItemsToSell;
 import org.dromio.client001.utility.AppColor;
+import org.dromio.client001.utility.CustomNotification;
 
 public class SingleItemSelectorView extends Dialog {
 
-    private final ItemToSell item;
+    private final ItemsToSell itemsToSell;
+    private ItemToSell item;
     private TextField selectedUnitField;
     private NumberField selectedQuantityField;
     private NumberField soldWithPriceField;
     private Button cancelButton;
     private Button saveButton;
 
-    public SingleItemSelectorView(ItemToSell item) {
+    public SingleItemSelectorView(ItemsToSell itemsToSell, ItemToSell item) {
+        this.itemsToSell = itemsToSell;
         this.item = item;
         // When this view is created populate it with
         // The values from the item which was clicked
@@ -51,8 +55,27 @@ public class SingleItemSelectorView extends Dialog {
 
     private void configureActionButtons() {
         saveButton.addClickListener(event -> {
-            close();
-            fireEvent(new SaveSelectionEvent(this));
+            try {
+                Integer quantityToAdd = 0;
+                if (selectedQuantityField.getValue() != null) {
+                    quantityToAdd = selectedQuantityField.getValue().intValue();
+                    if (quantityToAdd == 0) {
+                        CustomNotification.simpleWarningNotification("Selecting 0 quantity for " + this.item.getItemName() + "?, Consider clearing it from selections.");
+                    }
+                    else {
+                        itemsToSell.addItemsToSell(this.item, quantityToAdd);
+                        close();
+                        fireEvent(new SaveSelectionEvent(this));
+                    }
+                }
+                else {
+                    //this.selectedQuantityField.setErrorMessage("Please this field");
+                    CustomNotification.simpleWarningNotification("Please write the quantity you want to sell");
+                }
+            }
+            catch (IllegalArgumentException e) {
+                CustomNotification.simpleWarningNotification(e.getMessage());
+            }
         });
         cancelButton.addClickListener(event -> {
             close();

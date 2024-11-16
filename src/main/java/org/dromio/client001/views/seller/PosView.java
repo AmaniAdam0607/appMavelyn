@@ -103,7 +103,6 @@ public class PosView extends HorizontalLayout {
         confirmSaleButton.getStyle().set("background-color", AppColor.CONFIRM.toString()).set("color", "white");
         clearSelectedItemsButton.getStyle().set("background-color", AppColor.CANCEL.toString()).set("color", "white");
 
-
         confirmSaleButton.addClickListener( event -> {
             if (!itemsToSell.isEmpty()) {
                 // TODO a pop up that show total amount and allow money to be received in cash or via other means
@@ -182,9 +181,10 @@ public class PosView extends HorizontalLayout {
         selectedItemGrid.setEmptyStateText("No Item Selected");
         selectedItemGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         selectedItemGrid.addItemClickListener( event -> {
-            SingleItemSelectorView singleItemSelectorView = new SingleItemSelectorView(event.getItem());
+            SingleItemSelectorView singleItemSelectorView = new SingleItemSelectorView(this.itemsToSell,event.getItem());
 
             singleItemSelectorView.addSaveSelectionConfirmedListener( saveEvent -> {
+                refreshSelectedItemsGrid();
                 CustomNotification.simpleSuccessNotification("Saved Successfully!");
             });
 
@@ -204,7 +204,7 @@ public class PosView extends HorizontalLayout {
         inventoryGrid.addItemClickListener( event -> {
            InventoryItem inventoryItem = event.getItem();
            try {
-               itemsToSell.addItemToSell(new ItemToSell(inventoryItem));
+               itemsToSell.addItemToSell(new ItemToSell(inventoryItem), 1);
                refreshSelectedItemsGrid();
                logger.info("Item {} selected", inventoryItem.getItemName());
            }

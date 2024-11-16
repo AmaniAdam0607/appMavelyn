@@ -27,7 +27,46 @@ public class ItemsToSell {
      *              - if all is well then update the quantity
      * If the item was not selected before then add it to items to select
      * */
-    public void addItemToSell(ItemToSell itemToSell) {
+    public void addItemsToSell(ItemToSell itemToSell, Integer quantityToAdd) {
+        Integer quantityInStock = inventoryItemService.getItemQuantity(itemToSell.getComparingId());
+
+        logger.info("AddingItems :: Quantity in stock for {} is {}", itemToSell.getItemName(), quantityInStock);
+
+        if(quantityInStock <= 0) {
+            throw new IllegalArgumentException(itemToSell.getItemName() + " is out of stock");
+        }
+        ItemToSell existingItem = findItemByComparingId(itemToSell); // TODO write this code in a way that will not confuse me because currently if the item is found its quantity is updated by updating quantity of the reference that is returned here which means the variable created here points to the returned object in memory so changing it affects the item returned also. Its okay programmatically but confusing when I was checking the flow of this function.
+        if (existingItem != null) {
+            /*
+             * Notice that "existingItem" now points to an item that is in itemsToSell
+             * Changing anything on the "existingItem" variable propagates its changes to the item returned by findItemByComparingId(itemToSell)
+             * this brings the desired effect but is NOT clear at first glance
+             * God saving me from possible bugs.
+             * */
+            if ((quantityInStock - quantityToAdd) < 0) {
+                throw new IllegalArgumentException("You can not select more than what is in stock for " + itemToSell.getItemName());
+            }
+            /*
+             * At this point the following should hold true
+             *           (a) Item is not out of stock
+             *           (b) Selected items will not exceed the amount currently in stock
+             * */
+            existingItem.setSelectedQuantity(quantityToAdd);
+        } else {
+            selectedItems.add(itemToSell);
+        }
+    }
+
+
+    /**
+     * expectedOffset means what does the call expect invocation of this method to affect the quantity..if its two for example everytime this method is invoked 2 unit quantity wi; be added
+     * If the quantity of the selected item is zero in stock throw an exception
+     * If the item was already selected then:
+     *              - if the selected quantity will cause the stock quantity to reduce to a negative then throws an exception
+     *              - if all is well then update the quantity
+     * If the item was not selected before then add it to items to select
+     * */
+    public void addItemToSell(ItemToSell itemToSell, Integer expectedOffset) {
             Integer quantityInStock = inventoryItemService.getItemQuantity(itemToSell.getComparingId());
 
             logger.info("Quantity in stock for {} is {}", itemToSell.getItemName(), quantityInStock);
@@ -43,13 +82,13 @@ public class ItemsToSell {
                 * this brings the desired effect but is NOT clear at first glance
                 * God saving me from possible bugs.
                 * */
-                if ((quantityInStock - (existingItem.getSelectedQuantity() + 1)) < 0) { // TODO subtract against the 'expected' quantity and not the current selected quantity example here I add one since if we are to add we 'expect' the resulting selectedQuantity to be increased by one, this ok when item is added by clicking in the item selector but what if a user is given ability to specify quantity via an input field? Then the 'expected' quantity may or may not be more than one.
+                if ((quantityInStock - (existingItem.getSelectedQuantity() + expectedOffset)) < 0) {
                     throw new IllegalArgumentException("You can not select more than what is in stock for " + itemToSell.getItemName());
                 }
                 /*
                 * At this point the following should hold true
-                * (a) Item is not out of stock
-                * (b) Selected items will not exceed the amount currently in stock
+                *           (a) Item is not out of stock
+                *           (b) Selected items will not exceed the amount currently in stock
                 * */
                 existingItem.increaseQuantity(); // Increase quantity of the existing item
             } else {
