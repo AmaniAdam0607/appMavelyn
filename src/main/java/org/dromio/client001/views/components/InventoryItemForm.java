@@ -17,8 +17,11 @@ import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.converter.Converter;
 import com.vaadin.flow.shared.Registration;
 import org.dromio.client001.models.data.InventoryItem;
+import org.dromio.client001.models.service.InventoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class InventoryItemForm extends FormLayout {
 
@@ -101,8 +104,12 @@ public class InventoryItemForm extends FormLayout {
             logger.info("Save clicked with inventory item {}", inventoryItem);
             binder.writeBean(inventoryItem);
             fireEvent(new SaveEvent(this, inventoryItem));
+            setInventoryItem(new InventoryItem());
         } catch (ValidationException e) {
             logger.error("Error saving inventory item {}", e.getBeanValidationErrors());
+        }
+        catch (IllegalArgumentException ex) {
+            logger.error("Error while saving item {}", ex.getMessage());
         }
     }
 
@@ -129,7 +136,6 @@ public class InventoryItemForm extends FormLayout {
         DisableEvent(InventoryItemForm source, InventoryItem item) {
             super(source, item);
         }
-
     }
 
     public static class CloseEvent extends InventoryItemFormEvent {

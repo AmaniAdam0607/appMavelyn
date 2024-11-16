@@ -3,13 +3,13 @@ package org.dromio.client001.views;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.dromio.client001.models.data.InventoryItem;
 import org.dromio.client001.models.service.InventoryService;
+import org.dromio.client001.utility.CustomNotification;
 import org.dromio.client001.views.components.InventoryItemForm;
 
 import java.util.List;
@@ -23,9 +23,12 @@ public class InventoryManagementScreen extends HorizontalLayout {
     private final InventoryService inventoryService;
     Grid<InventoryItem> inventoryGrid;
     InventoryItemForm inventoryItemForm;
+    String INVENTORY_NAME;
+    private List<InventoryItem> items;
 
     public InventoryManagementScreen(InventoryService inventoryService) {
         this.inventoryService = inventoryService;
+        loadInventoryData();
         initGrid();
         configureForm();
         configureUi();
@@ -34,6 +37,11 @@ public class InventoryManagementScreen extends HorizontalLayout {
                 inventoryGrid,
                 inventoryItemForm
         );
+    }
+
+    private void loadInventoryData() {
+        INVENTORY_NAME = "Stationary Inventory";
+        items =  inventoryService.getInventoryItems(INVENTORY_NAME);
     }
 
     private void configureUi() {
@@ -48,7 +56,19 @@ public class InventoryManagementScreen extends HorizontalLayout {
         inventoryItemForm = new InventoryItemForm();
         inventoryItemForm.setInventoryItem(new InventoryItem());
 
+        inventoryItemForm.addSaveListener( event -> {
+            inventoryService.addItemsToAnInventory(INVENTORY_NAME, List.of(event.getInventoryItem()));
+           refreshInventoryGrid();
+            CustomNotification.simpleSuccessNotification("Item \"" + event.getInventoryItem().getItemName() + "\" successfully added to inventory");
+        });
+
     }
+
+    private void refreshInventoryGrid() {
+        loadInventoryData();
+        inventoryGrid.setItems(items);
+    }
+
 
     private void initGrid() {
         inventoryGrid = new Grid<>(InventoryItem.class, false);
@@ -60,8 +80,7 @@ public class InventoryManagementScreen extends HorizontalLayout {
         inventoryGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         inventoryGrid.setEmptyStateText("No inventory items found");
         inventoryGrid.setSizeFull();
-        String INVENTORY_NAME = "Stationary Inventory";
-        List<InventoryItem> items =  inventoryService.getInventoryItems(INVENTORY_NAME);
+
         GridListDataView<InventoryItem> dataView = inventoryGrid.setItems(items);
         inventoryGrid.asSingleSelect().addValueChangeListener(event -> editItem(event.getValue()));
     }
