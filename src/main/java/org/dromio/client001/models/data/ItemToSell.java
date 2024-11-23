@@ -2,21 +2,42 @@ package org.dromio.client001.models.data;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-
+@Component
 public class ItemToSell {
 
     String id;
     InventoryItem inventoryItem;
     Integer selectedQuantity = 1;
-
+    String sellingUnit;
+    Integer unitConversionFactor = 1;
+    Double soldWithPrice;
     Logger logger = LoggerFactory.getLogger(ItemToSell.class);
 
-    public ItemToSell(InventoryItem inventoryItem) {
+    public Integer getUnitConversionFactor() {
+        return unitConversionFactor;
+    }
+
+    public Double getSoldWithPrice() {
+        return soldWithPrice;
+    }
+
+    public void setSoldWithPrice(Double soldWithPrice) {
+        this.soldWithPrice = soldWithPrice;
+    }
+
+    public void setUnitConversionFactor(Integer unitConversionFactor) {
+        this.unitConversionFactor = unitConversionFactor;
+    }
+
+    public ItemToSell(InventoryItem inventoryItem, String sellingUnit) {
         id = UUID.randomUUID().toString();
         this.inventoryItem = inventoryItem;
+        this.sellingUnit = sellingUnit;
+        this.setSoldWithPrice(inventoryItem.getSellingPrice());
     }
 
     public ItemToSell(String id, InventoryItem inventoryItem, Integer selectedQuantity, Logger logger) {
@@ -55,11 +76,10 @@ public class ItemToSell {
 
     public void increaseQuantity() {
         selectedQuantity += 1;
-        //logger.info("Quantity for {} is ", selectedQuantity);
     }
 
     public Double getTotalPriceOfQuantitySelected() {
-        return this.selectedQuantity * this.inventoryItem.getSellingPrice();
+        return this.selectedQuantity * this.soldWithPrice;
     }
 
     public String getItemName() {
@@ -67,7 +87,7 @@ public class ItemToSell {
     }
 
     public Double getItemSellingPrice() {
-        return this.inventoryItem.getSellingPrice();
+        return this.soldWithPrice;
     }
 
     public Double getItemBuyingPrice() {
@@ -75,11 +95,14 @@ public class ItemToSell {
     }
 
     public String getSellingUnit() {
-        return "unit";
+        return sellingUnit;
     }
 
     public String getComparingId() {
         return this.inventoryItem.getInventoryItemId();
     }
 
+    public void setSellingUnit(String unit) {
+        this.sellingUnit = unit;
+    }
 }

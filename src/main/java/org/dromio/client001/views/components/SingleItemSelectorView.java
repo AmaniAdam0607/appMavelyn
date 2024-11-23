@@ -4,13 +4,15 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.shared.Registration;
 import org.dromio.client001.models.data.ItemToSell;
 import org.dromio.client001.models.data.ItemsToSell;
+import org.dromio.client001.models.data.Unit;
+import org.dromio.client001.models.service.UnitService;
 import org.dromio.client001.utility.AppColor;
 import org.dromio.client001.utility.CustomNotification;
 
@@ -18,15 +20,17 @@ public class SingleItemSelectorView extends Dialog {
 
     private final ItemsToSell itemsToSell;
     private ItemToSell item;
-    private TextField selectedUnitField;
+    private final UnitService unitService;
+    private ComboBox<Unit> unitComboBox;
     private NumberField selectedQuantityField;
     private NumberField soldWithPriceField;
     private Button cancelButton;
     private Button saveButton;
 
-    public SingleItemSelectorView(ItemsToSell itemsToSell, ItemToSell item) {
+    public SingleItemSelectorView(ItemsToSell itemsToSell, ItemToSell item, UnitService unitService) {
         this.itemsToSell = itemsToSell;
         this.item = item;
+        this.unitService = unitService;
         // When this view is created populate it with
         // The values from the item which was clicked
         // The changes should be validated when it is saved
@@ -43,7 +47,7 @@ public class SingleItemSelectorView extends Dialog {
     }
 
     private Component getContentWrapper() {
-        HorizontalLayout wrapper = new HorizontalLayout(selectedQuantityField,selectedUnitField, soldWithPriceField, saveButton, cancelButton);
+        HorizontalLayout wrapper = new HorizontalLayout(selectedQuantityField, unitComboBox, soldWithPriceField, saveButton, cancelButton);
         wrapper.setSizeFull();
         wrapper.getStyle()
                 .set("display", "flex")
@@ -62,8 +66,14 @@ public class SingleItemSelectorView extends Dialog {
                     if (quantityToAdd == 0) {
                         CustomNotification.simpleWarningNotification("Selecting 0 quantity for " + this.item.getItemName() + "?, Consider clearing it from selections.");
                     }
+                    else if (unitComboBox.getValue() == null) {
+                        CustomNotification.simpleWarningNotification("Please select the selling unit");
+                    }
+                    else if (soldWithPriceField.getValue()  == null) {
+                        CustomNotification.simpleWarningNotification("Please write the selling price");
+                    }
                     else {
-                        itemsToSell.addItemsToSell(this.item, quantityToAdd);
+                        itemsToSell.addItemsToSell(this.item, quantityToAdd, unitComboBox.getValue(), soldWithPriceField.getValue());
                         close();
                         fireEvent(new SaveSelectionEvent(this));
                     }
@@ -96,10 +106,11 @@ public class SingleItemSelectorView extends Dialog {
         // TODO the data types for quantities and money needs to be revised across the whole project
         styleActionButtonsLayout();
         selectedQuantityField = new NumberField("Quantity");
-        selectedUnitField = new TextField("Unit");
+        unitComboBox = new ComboBox<>("Selling Unit");
         soldWithPriceField = new NumberField("Price");
 
-        selectedUnitField.setValue(item.getSellingUnit());
+        unitComboBox.setItems(unitService.getThisItemUnits(this.item.getComparingId()));
+        unitComboBox.setItemLabelGenerator(Unit::getName);
         selectedQuantityField.setValue(item.getSelectedQuantity().doubleValue());
         soldWithPriceField.setValue(item.getItemSellingPrice());
 

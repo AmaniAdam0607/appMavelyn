@@ -18,6 +18,7 @@ import com.vaadin.flow.data.converter.Converter;
 import com.vaadin.flow.shared.Registration;
 import org.dromio.client001.models.data.InventoryItem;
 import org.dromio.client001.models.service.InventoryService;
+import org.dromio.client001.models.service.UnitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,26 +26,33 @@ import java.util.List;
 
 public class InventoryItemForm extends FormLayout {
 
+    private final UnitService unitService;
     Logger logger = LoggerFactory.getLogger(InventoryItemForm.class);
 
-    TextField itemName = new TextField("Item Name");
-    NumberField quantity = new NumberField("Quantity");
-    NumberField sellingPrice = new NumberField("Selling Price");
-    NumberField buyingPrice = new NumberField("Buying Price");
+    private final TextField itemName = new TextField("Item Name");
+    private final NumberField quantity = new NumberField("Quantity");
+    private final NumberField sellingPrice = new NumberField("Selling Price");
+    private final NumberField buyingPrice = new NumberField("Buying Price");
+    private final TextField stockingUnit = new TextField("Stocking Unit");
+    private String unit;
 
     Button save = new Button("Save");
     Button disable = new Button("Disable");
+    Button clearForm = new Button("Clear");
 
     BeanValidationBinder<InventoryItem> binder = new BeanValidationBinder<>(InventoryItem.class);
+    BeanValidationBinder<InventoryItemForm> unitBinder = new BeanValidationBinder<>(InventoryItemForm.class);
     private InventoryItem inventoryItem;
 
-    public InventoryItemForm() {
+    public InventoryItemForm(UnitService unitService) {
+        this.unitService = unitService;
         bindFields();
         add(
                 itemName,
                 sellingPrice,
                 buyingPrice,
                 quantity,
+                stockingUnit,
                 createButtonLayout()
         );
     }
@@ -62,12 +70,14 @@ public class InventoryItemForm extends FormLayout {
             disable.setEnabled(false);
         }
         binder.readBean(this.inventoryItem);
+        unitBinder.readBean(this);
     }
 
     private void bindFields() {
         binder.bind(itemName, InventoryItem::getItemName, InventoryItem::setItemName);
         binder.bind(sellingPrice, InventoryItem::getSellingPrice, InventoryItem::setSellingPrice);
         binder.bind(buyingPrice, InventoryItem::getBuyingPrice, InventoryItem::setBuyingPrice);
+        unitBinder.bind(stockingUnit, this::getUnit, this::setUnit);
         binder.forField(quantity)
                 .withConverter(new Converter<Double, Integer>() {
                     @Override
@@ -94,16 +104,22 @@ public class InventoryItemForm extends FormLayout {
         save.addClickShortcut(Key.ENTER);
 
         save.addClickListener( event -> validateAndSave());
-        disable.addClickListener( event -> fireEvent(new DisableEvent(this, inventoryItem)));
+        disable.addClickListener( event -> fireEvent(new DisableEvent(this, inventoryItem, unit)));
+        clearForm.addClickListener( event -> {
+            setInventoryItem(new InventoryItem());
+            fireEvent( new ClearEvent(this));
+        }
+        );
 
-        return new HorizontalLayout(save, disable);
+        return new HorizontalLayout(save, disable, clearForm);
     }
 
     private void validateAndSave() {
         try {
             logger.info("Save clicked with inventory item {}", inventoryItem);
             binder.writeBean(inventoryItem);
-            fireEvent(new SaveEvent(this, inventoryItem));
+            unitBinder.writeBean(this);
+            fireEvent(new SaveEvent(this, inventoryItem, unit));
             setInventoryItem(new InventoryItem());
         } catch (ValidationException e) {
             logger.error("Error saving inventory item {}", e.getBeanValidationErrors());
@@ -115,36 +131,42 @@ public class InventoryItemForm extends FormLayout {
 
     public static abstract class InventoryItemFormEvent extends ComponentEvent<InventoryItemForm> {
         private InventoryItem item;
+        private String unit;
 
-        protected InventoryItemFormEvent(InventoryItemForm source, InventoryItem item) {
+        protected InventoryItemFormEvent(InventoryItemForm source, InventoryItem item, String unit) {
             super(source, false);
             this.item = item;
+            this.unit = unit;
         }
 
         public InventoryItem getInventoryItem() {
             return item;
         }
+
+        public String getUnit() {
+            return unit;
+        }
     }
 
     public static class SaveEvent extends InventoryItemFormEvent {
-        SaveEvent(InventoryItemForm source, InventoryItem item) {
-            super(source, item);
+        SaveEvent(InventoryItemForm source, InventoryItem item, String unit) {
+            super(source, item, unit);
         }
     }
 
     public static class DisableEvent extends InventoryItemFormEvent {
-        DisableEvent(InventoryItemForm source, InventoryItem item) {
-            super(source, item);
+        DisableEvent(InventoryItemForm source, InventoryItem item, String unit) {
+            super(source, item, unit);
         }
     }
 
-    public static class CloseEvent extends InventoryItemFormEvent {
-        CloseEvent(InventoryItemForm source) {
-            super(source, null);
+    public static class ClearEvent extends InventoryItemFormEvent {
+        ClearEvent(InventoryItemForm source) {
+            super(source, null, null);
         }
     }
 
-    public Registration addDeleteListener(ComponentEventListener<DisableEvent> listener) {
+    public Registration addDisableListener(ComponentEventListener<DisableEvent> listener) {
         return addListener(DisableEvent.class, listener);
     }
 
@@ -152,8 +174,20 @@ public class InventoryItemForm extends FormLayout {
         return addListener(SaveEvent.class, listener);
     }
 
-    public Registration addCloseListener(ComponentEventListener<CloseEvent> listener) {
-        return addListener(CloseEvent.class, listener);
+    public Registration addClearListener(ComponentEventListener<ClearEvent> listener) {
+        return addListener(ClearEvent.class, listener);
+    }
+
+
+    public void setUnit(InventoryItemForm inventoryItemForm, String s) {
+        unit = s;
+    }
+
+    public String getUnit(InventoryItemForm inventoryItemForm) {
+        if (inventoryItem.getInventoryItemId() == null) {
+            return "";
+        }
+        return unitService.getItemStockingUnitName(inventoryItem.getInventoryItemId());
     }
 
 }

@@ -27,9 +27,9 @@ public class ItemsToSell {
      *              - if all is well then update the quantity
      * If the item was not selected before then add it to items to select
      * */
-    public void addItemsToSell(ItemToSell itemToSell, Integer quantityToAdd) {
+    public void addItemsToSell(ItemToSell itemToSell, Integer quantityToAdd, Unit unit, Double sellingPrice) {
         Integer quantityInStock = inventoryItemService.getItemQuantity(itemToSell.getComparingId());
-
+        Integer quantitiesThatWillBeDeductedFromStock = quantityToAdd * unit.getConversionFactor();
         logger.info("AddingItems :: Quantity in stock for {} is {}", itemToSell.getItemName(), quantityInStock);
 
         if(quantityInStock <= 0) {
@@ -43,7 +43,7 @@ public class ItemsToSell {
              * this brings the desired effect but is NOT clear at first glance
              * God saving me from possible bugs.
              * */
-            if ((quantityInStock - quantityToAdd) < 0) {
+            if ((quantityInStock - quantitiesThatWillBeDeductedFromStock) < 0) {
                 throw new IllegalArgumentException("You can not select more than what is in stock for " + itemToSell.getItemName());
             }
             /*
@@ -51,7 +51,10 @@ public class ItemsToSell {
              *           (a) Item is not out of stock
              *           (b) Selected items will not exceed the amount currently in stock
              * */
+            existingItem.setSellingUnit(unit.getName());
             existingItem.setSelectedQuantity(quantityToAdd);
+            existingItem.setUnitConversionFactor(unit.getConversionFactor());
+            existingItem.setSoldWithPrice(sellingPrice);
         } else {
             selectedItems.add(itemToSell);
         }
@@ -68,7 +71,6 @@ public class ItemsToSell {
      * */
     public void addItemToSell(ItemToSell itemToSell, Integer expectedOffset) {
             Integer quantityInStock = inventoryItemService.getItemQuantity(itemToSell.getComparingId());
-
             logger.info("Quantity in stock for {} is {}", itemToSell.getItemName(), quantityInStock);
 
             if(quantityInStock <= 0) {
@@ -84,6 +86,9 @@ public class ItemsToSell {
                 * */
                 if ((quantityInStock - (existingItem.getSelectedQuantity() + expectedOffset)) < 0) {
                     throw new IllegalArgumentException("You can not select more than what is in stock for " + itemToSell.getItemName());
+                }
+                if(!existingItem.getSellingUnit().equals(itemToSell.getSellingUnit())) {
+                    throw new IllegalArgumentException("Conflicting unit selection");
                 }
                 /*
                 * At this point the following should hold true
@@ -127,7 +132,7 @@ public class ItemsToSell {
 
     public List<ItemToSell> getSoldItems() {
         for (ItemToSell item : selectedItems) {
-            inventoryItemService.reduceItemQuantity(item.getComparingId(), item.selectedQuantity);
+            inventoryItemService.reduceItemQuantity(item.getComparingId(), item.selectedQuantity * item.getUnitConversionFactor());
         }
         return this.selectedItems;
     }

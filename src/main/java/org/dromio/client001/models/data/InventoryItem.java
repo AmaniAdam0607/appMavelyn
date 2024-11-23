@@ -12,31 +12,47 @@ public class InventoryItem {
     @GeneratedValue( strategy = GenerationType.UUID )
     String inventoryItemId;
 
+    String inventoryId;
+
     @NotNull(message = "Item name can not be empty")
     @NotEmpty(message = "Item name can not be empty")
     String itemName;
 
-    @NotNull(message = "Item name can not be empty")
+    @NotNull(message = "Item quantity can not be empty")
     @Min(value = 0, message = "Quantity can not be zero")
     Integer quantity;
 
-    @NotNull(message = "Item name can not be empty")
+    @NotNull(message = "Item selling price can not be empty")
     @Min(value = 0, message = "Selling price can not be zero")
     Double sellingPrice;
 
-    @NotNull(message = "Item name can not be empty")
+    @NotNull(message = "Item buying can not be empty")
     @Min(value = 0, message = "Buying price can not be zero")
     Double buyingPrice;
 
-    String unit;
-
-    public InventoryItem(String inventoryItemId, String itemName, Integer quantity, Double sellingPrice, Double buyingPrice, String unit) {
+    public InventoryItem(String inventoryItemId, String itemName, Integer quantity, Double sellingPrice, Double buyingPrice) {
         this.inventoryItemId = inventoryItemId;
         this.itemName = itemName;
         this.quantity = quantity;
         this.sellingPrice = sellingPrice;
         this.buyingPrice = buyingPrice;
-        this.unit = unit;
+    }
+
+    public InventoryItem(String inventoryItemId, String inventoryId, String itemName, Integer quantity, Double sellingPrice, Double buyingPrice) {
+        this.inventoryItemId = inventoryItemId;
+        this.inventoryId = inventoryId;
+        this.itemName = itemName;
+        this.quantity = quantity;
+        this.sellingPrice = sellingPrice;
+        this.buyingPrice = buyingPrice;
+    }
+
+    public String getInventoryId() {
+        return inventoryId;
+    }
+
+    public void setInventoryId(String inventoryId) {
+        this.inventoryId = inventoryId;
     }
 
     public InventoryItem() {
@@ -82,11 +98,4 @@ public class InventoryItem {
         this.buyingPrice = buyingPrice;
     }
 
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
 }

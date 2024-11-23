@@ -22,6 +22,7 @@ import org.dromio.client001.models.data.ItemsToSell;
 import org.dromio.client001.models.data.Sales;
 import org.dromio.client001.models.repository.SalesRepository;
 import org.dromio.client001.models.service.InventoryService;
+import org.dromio.client001.models.service.UnitService;
 import org.dromio.client001.utility.AppColor;
 import org.dromio.client001.utility.CustomNotification;
 import org.dromio.client001.views.components.SaleReceivePaymentView;
@@ -40,6 +41,7 @@ public class PosView extends HorizontalLayout {
     private final InventoryService inventoryService;
     private final ItemsToSell itemsToSell;
     private final SalesRepository salesRepository;
+    private final UnitService unitService;
 
     Button confirmSaleButton;
     Button clearSelectedItemsButton;
@@ -52,10 +54,11 @@ public class PosView extends HorizontalLayout {
 
     List<InventoryItem> items;
 
-    public PosView(InventoryService inventoryService, ItemsToSell itemsToSell, SalesRepository salesRepository) {
+    public PosView(InventoryService inventoryService, ItemsToSell itemsToSell, SalesRepository salesRepository, UnitService unitService) {
         this.inventoryService = inventoryService;
         this.itemsToSell = itemsToSell;
         this.salesRepository = salesRepository;
+        this.unitService = unitService;
 
         initUi();
         loadInventoryData();
@@ -148,7 +151,7 @@ public class PosView extends HorizontalLayout {
         }
         catch (Exception e) {
             logger.error("Error when trying to confirm sale {}", e.getMessage());
-            CustomNotification.simpleErrorNotification("Something unexpected have occurred, please communicate this issue to the administrator.");
+            CustomNotification.simpleErrorNotification("Sale failed, please try again after a refresh.");
         }
     }
 
@@ -174,15 +177,14 @@ public class PosView extends HorizontalLayout {
         selectedItemGrid = new Grid<>(ItemToSell.class, false);
         selectedItemGrid.addColumn(ItemToSell::getItemName).setHeader("Name");
         selectedItemGrid.addColumn(ItemToSell::getSelectedQuantity).setHeader("Quantity");
-        selectedItemGrid.addColumn(ItemToSell::getSellingUnit).setHeader("Unit");
+        selectedItemGrid.addColumn(ItemToSell::getSellingUnit).setHeader("Selling Unit");
         selectedItemGrid.addColumn(ItemToSell::getItemSellingPrice).setHeader("Price");
         selectedItemGrid.addColumn(ItemToSell::getTotalPriceOfQuantitySelected).setHeader("Sum");
         selectedItemGrid.setItems(itemsToSell.getSelectedItems());
         selectedItemGrid.setEmptyStateText("No Item Selected");
         selectedItemGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         selectedItemGrid.addItemClickListener( event -> {
-            SingleItemSelectorView singleItemSelectorView = new SingleItemSelectorView(this.itemsToSell,event.getItem());
-
+            SingleItemSelectorView singleItemSelectorView = new SingleItemSelectorView(this.itemsToSell,event.getItem(), unitService);
             singleItemSelectorView.addSaveSelectionConfirmedListener( saveEvent -> {
                 refreshSelectedItemsGrid();
                 CustomNotification.simpleSuccessNotification("Saved Successfully!");
@@ -199,12 +201,13 @@ public class PosView extends HorizontalLayout {
         inventoryGrid = new Grid<>(InventoryItem.class, false);
         inventoryGrid.addColumn(InventoryItem::getItemName).setHeader("Item Name");
         inventoryGrid.addColumn(InventoryItem::getQuantity).setHeader("Quantity");
+        inventoryGrid.addColumn( inventoryItem -> unitService.getItemStockingUnitName(inventoryItem.getInventoryItemId())).setHeader("Stocking Unit");
         inventoryGrid.addColumn(InventoryItem::getSellingPrice).setHeader("Selling Price");
         inventoryGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         inventoryGrid.addItemClickListener( event -> {
            InventoryItem inventoryItem = event.getItem();
            try {
-               itemsToSell.addItemToSell(new ItemToSell(inventoryItem), 1);
+               itemsToSell.addItemToSell(new ItemToSell(inventoryItem, unitService.getItemStockingUnitName(inventoryItem.getInventoryItemId())), 1);
                refreshSelectedItemsGrid();
                logger.info("Item {} selected", inventoryItem.getItemName());
            }

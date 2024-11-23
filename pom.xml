@@ -60,6 +60,12 @@
         </dependency>
 
         <dependency>
+            <groupId>software.xdev</groupId>
+            <artifactId>vaadin-grid-filter</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
@@ -137,6 +143,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <nodeAutoUpdate>true</nodeAutoUpdate>
+                </configuration>
             </plugin>
         </plugins>
     </build>

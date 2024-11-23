@@ -16,7 +16,6 @@ public class Inventory {
     public Inventory(String inventoryId, String name, List<InventoryItem> items) {
         this.inventoryId = inventoryId;
         this.name = name;
-        this.items = items;
     }
 
     public Inventory() {
@@ -25,16 +24,6 @@ public class Inventory {
     public Inventory(String name) {
         this.name = name;
     }
-
-    @OneToMany(
-            cascade = CascadeType.ALL
-    )
-    @JoinColumn(
-            name = "inventory_id",
-            referencedColumnName = "inventoryId"
-    )
-    private List<InventoryItem> items;
-
 
     public String getName() {
         return name;
@@ -52,11 +41,4 @@ public class Inventory {
         this.inventoryId = inventoryId;
     }
 
-    public List<InventoryItem> getItems() {
-        return items;
-    }
-
-    public void setItems(List<InventoryItem> items) {
-        this.items = items;
-    }
 }
